@@ -1,125 +1,125 @@
 import { menuArray } from "./data.js";
-let myOrder = {}
+let myOrder = {};
 
-
-document.addEventListener('click', (e) => {
-    if (e.target.closest('#add-item')) {
-        showQuantity('add', e)
-    } else if (e.target.closest('#decrease-item')) {
-        showQuantity('sub', e)
-    } else if (e.target.closest('#close-icon')) {
-        document.querySelector(".final-purchase").classList.add('hidden')
-    } else if (e.target.matches("#order-button")) {
-        document.querySelector(".final-purchase").classList.remove('hidden')
-    } else if (e.target.matches("#pay-order")) {
-        e.preventDefault();
-        const name = document.querySelector("#full-name").value.trim();
-        const cardNumber = document.querySelector("#card-number").value.trim();
-        const cvv = document.querySelector("#cvv").value.trim();
-        if (!name || !cardNumber || !cvv) {
-            alert("Please fill all required fields");
-        } else {
-            document.querySelector(".final-purchase").classList.add('hidden')
-            emptyCart()
-            render()
-            renderCart()
-            document.querySelector("#order-completion").classList.remove('hidden');
-        }
-
+document.addEventListener("click", (e) => {
+  if (e.target.closest("#add-item")) {
+    showQuantity("add", e);
+  } else if (e.target.closest("#decrease-item")) {
+    showQuantity("sub", e);
+  } else if (e.target.closest("#close-icon")) {
+    document.querySelector(".final-purchase").classList.add("hidden");
+  } else if (e.target.matches("#order-button")) {
+    document.querySelector(".final-purchase").classList.remove("hidden");
+  } else if (e.target.matches("#pay-order")) {
+    e.preventDefault();
+    const name = document.querySelector("#full-name").value.trim();
+    const cardNumber = document.querySelector("#card-number").value.trim();
+    const cvv = document.querySelector("#cvv").value.trim();
+    if (!name || !cardNumber || !cvv) {
+      alert("Please fill all required fields");
+    } else {
+      document.querySelector(".final-purchase").classList.add("hidden");
+      emptyCart();
+      render();
+      renderCart();
+      document.querySelector("#order-completion").classList.remove("hidden");
     }
+  }
 });
 
 document.querySelector(".cart").addEventListener("click", (e) => {
-    if (e.target.matches(".remove-button")) {
-        const menuItemId = e.target.closest(".cart-desc").dataset.menuId;
-        menuArray[menuItemId].numberOrdered = 0;
-        render();
-        renderCart();
-    }
+  if (e.target.matches(".remove-button")) {
+    const menuItemId = e.target.closest(".cart-desc").dataset.menuId;
+    menuArray[menuItemId].numberOrdered = 0;
+    render();
+    renderCart();
+  }
 });
 
 function emptyCart() {
-    menuArray.forEach((menuItem) => {
-        menuItem.numberOrdered = 0;
-    })
+  menuArray.forEach((menuItem) => {
+    menuItem.numberOrdered = 0;
+  });
 }
 
 function showQuantity(addOrSub, e) {
-    const menuItemId = e.target.closest('.quantity').dataset.menuId;
-    let numOrdered = menuArray[menuItemId].numberOrdered
+  const menuItemId = e.target.closest(".quantity").dataset.menuId;
+  let numOrdered = menuArray[menuItemId].numberOrdered;
 
-    if (addOrSub === 'add' && numOrdered >= 0) {
-        menuArray[menuItemId].numberOrdered++;
-    } else if (addOrSub === 'sub') { 
-        // the quantity can't go below 0 implement a condition for this
-        menuArray[menuItemId].numberOrdered--;
-    }
+  if (addOrSub === "add" && numOrdered >= 0) {
+    menuArray[menuItemId].numberOrdered++;
+  } else if (numOrdered !== 0 && addOrSub === "sub") {
+    // the quantity can't go below 0 implement a condition for this
+    menuArray[menuItemId].numberOrdered--;
+  }
 
-
-    render();
-    renderCart();
-    //console.log(`${addOrSub} button clicked for menu item with ID ${menuItemId}`);
+  render();
+  renderCart();
+  //console.log(`${addOrSub} button clicked for menu item with ID ${menuItemId}`);
 }
 
 function getCartHtml() {
-    let cartHtml = '<h3 id="order-title">Your Order</h3>'
-    let cartArray = []
-    let totalPrice = 0
+  let cartHtml = '<h3 id="order-title">Your Order</h3>';
+  let cartArray = [];
+  let totalPrice = 0;
 
-    menuArray.forEach((menuItem, index) => {
-        if (menuItem.numberOrdered > 0) {
-            cartArray.push(menuItem)
+  menuArray.forEach((menuItem, index) => {
+    if (menuItem.numberOrdered > 0) {
+      cartArray.push(menuItem);
 
-            cartHtml += `
+      cartHtml += `
             <div class='cart-desc'  data-menu-id=${index}>
-                <p class="cart-item-title">${menuItem.name} ${menuItem.emoji}</p>
+                <p class="cart-item-title">${menuItem.name} ${
+        menuItem.emoji
+      }</p>
                 <span class="remove-button">(remove)</span>
-                <p class="price"><span class="quantity-items">(x ${menuItem.numberOrdered})</span>$ ${menuItem.price * menuItem.numberOrdered}</p>
+                <p class="price"><span class="quantity-items">(x ${
+                  menuItem.numberOrdered
+                })</span>$ ${menuItem.price * menuItem.numberOrdered}</p>
             </div>
-            `
-            totalPrice += menuItem.price + menuItem.numberOrdered // total price is not getting calculated properly
-        }
-    })
-    //console.log(cartArray)
-    if (cartArray.length > 0) {
-        document.querySelector(".cart").classList.remove("hidden-visibility")
+            `;
+      totalPrice += menuItem.price * menuItem.numberOrdered; // total price is not getting calculated properly
     }
-    else {
-        document.querySelector(".cart").classList.add("hidden-visibility")
-        //console.log(document.querySelector(".cart").classList)
-    }
-    cartHtml += `
+  });
+  //console.log(cartArray)
+  if (cartArray.length > 0) {
+    document.querySelector(".cart").classList.remove("hidden-visibility");
+  } else {
+    document.querySelector(".cart").classList.add("hidden-visibility");
+    //console.log(document.querySelector(".cart").classList)
+  }
+  cartHtml += `
         <div class="total-bar">
             <h3 id="total-cost">TOTAL COST:</h3>
             <h3 id="total-cost-value">$ ${totalPrice} </h3>
         </div>
         <section class='order-complete'>
             <button class='order-button' id='order-button'>Complete order</button>
-        </section>`
-    return cartHtml
+        </section>`;
+  return cartHtml;
 }
 
 function renderCart() {
-    document.querySelector(".cart").innerHTML = getCartHtml()
+  document.querySelector(".cart").innerHTML = getCartHtml();
 }
 
 function getMenuHtml() {
-    let menuHtml = '';
-    let ingredientsString = '';
+  let menuHtml = "";
+  let ingredientsString = "";
 
-    menuArray.forEach((menuItem, index) => {
-        let itemsOrdered = menuItem.numberOrdered;
-        let itemsOrderedClass = 'number-of-items';
+  menuArray.forEach((menuItem, index) => {
+    let itemsOrdered = menuItem.numberOrdered;
+    let itemsOrderedClass = "number-of-items";
 
-        if (itemsOrdered === 0) {
-            itemsOrderedClass = 'number-of-items hidden';
-        }
+    if (itemsOrdered === 0) {
+      itemsOrderedClass = "number-of-items hidden";
+    }
 
-        menuItem.ingredients.forEach((ingredient) => {
-            ingredientsString += `${ingredient}, `;
-        });
+    menuItem.ingredients.forEach((ingredient) => {
+      ingredientsString += `${ingredient}, `;
+    });
 
-        menuHtml += `
+    menuHtml += `
             <div class='menu-item' id='menu-item'>
                 <img src=${menuItem.image} class='menu-pic' id=${menuItem.name}>
                 <div class='menu-desc'>
@@ -137,14 +137,14 @@ function getMenuHtml() {
             </div>
         `;
 
-        ingredientsString = '';
-    });
+    ingredientsString = "";
+  });
 
-    return menuHtml;
+  return menuHtml;
 }
 
 function render() {
-    document.getElementById('menu').innerHTML = getMenuHtml();
+  document.getElementById("menu").innerHTML = getMenuHtml();
 }
 
 render();
