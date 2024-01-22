@@ -6,7 +6,6 @@ body {
 /* the direction of flex items are wrong. the hint should give idea about the property name */
 .site {
     display: flex;
-    flex-direction: column;
     margin: auto;
     width: 600px;
 }
